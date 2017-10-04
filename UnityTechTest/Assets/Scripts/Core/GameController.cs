@@ -9,18 +9,12 @@ public class GameController : MonoBehaviour
 	public Text playerHand;
 	public Text enemyHand;
 
-	private Text _nameLabel;
-	private Text _moneyLabel;
+	[SerializeField] private Text _nameLabel;
+	[SerializeField] private Text _moneyLabel;
 
 	private Player _player;
 
     private PlayerInfoLoader _playerInfoLoader;
-    void Awake()
-	{
-        // remove this from awake
-		_nameLabel = transform.Find ("Canvas/Name").GetComponent<Text>();
-		_moneyLabel = transform.Find ("Canvas/Money").GetComponent<Text>();
-	}
 
 	void Start()
 	{
@@ -65,11 +59,6 @@ public class GameController : MonoBehaviour
 
 		UpdateGame(playerChoice);
 	}
-
-    public void HandlePlayerInputWithEnum(UseableItem item)
-    {
-        
-    }
 
 	private void UpdateGame(UseableItem playerChoice)
 	{
