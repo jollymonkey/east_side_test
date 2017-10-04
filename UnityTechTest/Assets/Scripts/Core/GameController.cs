@@ -14,17 +14,20 @@ public class GameController : MonoBehaviour
 
 	private Player _player;
 
-	void Awake()
+    private PlayerInfoLoader _playerInfoLoader;
+    void Awake()
 	{
+        // remove this from awake
 		_nameLabel = transform.Find ("Canvas/Name").GetComponent<Text>();
 		_moneyLabel = transform.Find ("Canvas/Money").GetComponent<Text>();
 	}
 
 	void Start()
 	{
-		PlayerInfoLoader playerInfoLoader = new PlayerInfoLoader();
-		playerInfoLoader.OnLoaded += OnPlayerInfoLoaded;
-		playerInfoLoader.load();
+        _playerInfoLoader = new PlayerInfoLoader();
+        _playerInfoLoader.OnLoaded += OnPlayerInfoLoaded;
+        _playerInfoLoader.load("testuser");
+	    _playerInfoLoader.Save();
 	}
 
 	void Update()
@@ -32,9 +35,9 @@ public class GameController : MonoBehaviour
 		UpdateHud();
 	}
 
-	public void OnPlayerInfoLoaded(Hashtable playerData)
+	public void OnPlayerInfoLoaded(Player playerData)
 	{
-		_player = new Player(playerData);
+	    _player = playerData;
 	}
 
 	public void UpdateHud()
@@ -63,6 +66,11 @@ public class GameController : MonoBehaviour
 		UpdateGame(playerChoice);
 	}
 
+    public void HandlePlayerInputWithEnum(UseableItem item)
+    {
+        
+    }
+
 	private void UpdateGame(UseableItem playerChoice)
 	{
 		UpdateGameLoader updateGameLoader = new UpdateGameLoader(playerChoice);
@@ -76,6 +84,8 @@ public class GameController : MonoBehaviour
 		enemyHand.text = DisplayResultAsText((UseableItem)gameUpdateData["resultOpponent"]);
 
 		_player.ChangeCoinAmount((int)gameUpdateData["coinsAmountChange"]);
+
+        _playerInfoLoader.Save();
 	}
 
 	private string DisplayResultAsText (UseableItem result)
