@@ -14,81 +14,85 @@ public class GameController : MonoBehaviour
 
 	private Player _player;
 
+    private UseableItemManager _useableItemManager;
+
     private PlayerInfoLoader _playerInfoLoader;
+    private UsableItemsLoader _usableItemsLoader;
 
 	void Start()
 	{
+        _usableItemsLoader = new UsableItemsLoader();
+	    _usableItemsLoader.OnLoaded += OnUseableItemsLoaded;
+        _usableItemsLoader.load();
+	}
+
+    private void OnUseableItemsLoaded(UseableItem[] possibleItem)
+    {
+        _useableItemManager = new UseableItemManager();
+        _useableItemManager.Initialize(possibleItem);
+
         _playerInfoLoader = new PlayerInfoLoader();
         _playerInfoLoader.OnLoaded += OnPlayerInfoLoaded;
-        _playerInfoLoader.load("testuser");
-	    _playerInfoLoader.Save();
-	}
+        _playerInfoLoader.load("testuser"); // todo change to take in name, or pull last user
+    }
 
-	void Update()
-	{
-		UpdateHud();
-	}
-
-	public void OnPlayerInfoLoaded(Player playerData)
+    private void OnPlayerInfoLoaded(Player playerData)
 	{
 	    _player = playerData;
+        UpdateHud();
 	}
 
 	public void UpdateHud()
 	{
 		_nameLabel.text = "Name: " + _player.GetName();
-		_moneyLabel.text = "Money: $" + _player.GetCoins().ToString();
+	    OnMoneyChanged();
 	}
+
+    private void OnMoneyChanged()
+    {
+        _moneyLabel.text = "Money: $" + _player.GetCoins().ToString();
+    }
 
 	public void HandlePlayerInput(int item)
 	{
-		UseableItem playerChoice = UseableItem.None;
+		EUseableItem playerChoice = EUseableItem.None;
 
 		switch (item)
 		{
 			case 1:
-				playerChoice = UseableItem.Rock;
+				playerChoice = EUseableItem.Rock;
 				break;
 			case 2:
-				playerChoice = UseableItem.Paper;
+				playerChoice = EUseableItem.Paper;
 				break;
 			case 3:
-				playerChoice = UseableItem.Scissors;
+				playerChoice = EUseableItem.Scissors;
 				break;
 		}
 
 		UpdateGame(playerChoice);
 	}
 
-	private void UpdateGame(UseableItem playerChoice)
+	private void UpdateGame(EUseableItem playerChoice)
 	{
-		UpdateGameLoader updateGameLoader = new UpdateGameLoader(playerChoice);
+		UpdateGameLoader updateGameLoader = new UpdateGameLoader(_useableItemManager, playerChoice);
 		updateGameLoader.OnLoaded += OnGameUpdated;
 		updateGameLoader.load();
 	}
 
 	public void OnGameUpdated(Hashtable gameUpdateData)
 	{
-		playerHand.text = DisplayResultAsText((UseableItem)gameUpdateData["resultPlayer"]);
-		enemyHand.text = DisplayResultAsText((UseableItem)gameUpdateData["resultOpponent"]);
+		playerHand.text = DisplayResultAsText((EUseableItem)gameUpdateData["resultPlayer"]);
+		enemyHand.text = DisplayResultAsText((EUseableItem)gameUpdateData["resultOpponent"]);
 
 		_player.ChangeCoinAmount((int)gameUpdateData["coinsAmountChange"]);
+	    OnMoneyChanged();
 
         _playerInfoLoader.Save();
 	}
 
-	private string DisplayResultAsText (UseableItem result)
+	private string DisplayResultAsText (EUseableItem result)
 	{
-		switch (result)
-		{
-			case UseableItem.Rock:
-				return "Rock";
-			case UseableItem.Paper:
-				return "Paper";
-			case UseableItem.Scissors:
-				return "Scissors";
-		}
-
-		return "Nothing";
+	    return _useableItemManager.GetUsableItemNameByEnum(result);
 	}
 }

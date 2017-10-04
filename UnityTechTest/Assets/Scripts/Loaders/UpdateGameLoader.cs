@@ -7,16 +7,18 @@ public class UpdateGameLoader
 	public delegate void OnLoadedAction(Hashtable gameUpdateData);
 	public event OnLoadedAction OnLoaded;
 
-	private UseableItem _choice;
-
-	public UpdateGameLoader(UseableItem playerChoice)
+	private EUseableItem _choice;
+    private UseableItemManager _itemManager;
+    
+	public UpdateGameLoader(UseableItemManager itemManager, EUseableItem playerChoice)
 	{
 		_choice = playerChoice;
+	    _itemManager = itemManager;
 	}
 
 	public void load()
 	{
-		UseableItem opponentHand = (UseableItem)Enum.GetValues(typeof(UseableItem)).GetValue(UnityEngine.Random.Range(1, 4));
+		EUseableItem opponentHand = (EUseableItem)Enum.GetValues(typeof(EUseableItem)).GetValue(UnityEngine.Random.Range(1, (int)EUseableItem.MAX));
 
 		Hashtable mockGameUpdate = new Hashtable();
 		mockGameUpdate["resultPlayer"] = _choice;
@@ -26,9 +28,9 @@ public class UpdateGameLoader
 		OnLoaded(mockGameUpdate);
 	}
 
-	private int GetCoinsAmount (UseableItem playerHand, UseableItem opponentHand)
+	private int GetCoinsAmount (EUseableItem playerHand, EUseableItem opponentHand)
 	{
-		Result drawResult = ResultAnalyzer.GetResultState(playerHand, opponentHand);
+		Result drawResult = ResultAnalyzer.GetResultState(_itemManager, playerHand, opponentHand);
 
 		if (drawResult.Equals (Result.Won))
 		{
@@ -38,11 +40,7 @@ public class UpdateGameLoader
 		{
 			return -10;
 		}
-		else
-		{
-			return 0;
-		}
-
+		
 		return 0;
 	}
 }
