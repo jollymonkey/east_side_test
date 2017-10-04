@@ -9,11 +9,13 @@ public class UpdateGameLoader
 
 	private EUseableItem _choice;
     private UseableItemManager _itemManager;
+    private int _betAmount;
     
-	public UpdateGameLoader(UseableItemManager itemManager, EUseableItem playerChoice)
+	public UpdateGameLoader(UseableItemManager itemManager, EUseableItem playerChoice, int betAmount)
 	{
 		_choice = playerChoice;
-	    _itemManager = itemManager;
+	    _itemManager = itemManager; // only passing this to simulate the server
+	    _betAmount = betAmount;
 	}
 
 	public void load()
@@ -26,20 +28,20 @@ public class UpdateGameLoader
 
         Result result = ResultAnalyzer.GetResultState(_itemManager, _choice, opponentHand);
 	    mockGameUpdate["result"] = result;
-        mockGameUpdate["coinsAmountChange"] = GetCoinsAmount(result);
+	    mockGameUpdate["coinsAmountChange"] = GetCoinsAmount(result, _betAmount);
 
         OnLoaded(mockGameUpdate);
 	}
 
-	private int GetCoinsAmount (Result drawResult)
+	private int GetCoinsAmount (Result drawResult, int betAmount)
 	{
 		if (drawResult.Equals (Result.Won))
 		{
-			return 10;
+			return betAmount;
 		}
 		else if (drawResult.Equals (Result.Lost))
 		{
-			return -10;
+			return -betAmount;
 		}
 		
 		return 0;

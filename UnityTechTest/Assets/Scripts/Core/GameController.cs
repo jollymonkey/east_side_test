@@ -16,6 +16,9 @@ public class GameController : MonoBehaviour
     [SerializeField] private GridLayoutGroup choiceButtonGrid;
     [SerializeField] private ChoiceButton _choiceButtonPrefab;
 
+    [SerializeField] private Text betText;
+    private int currentBet = 10;
+
     private List<ChoiceButton> choiceButons;
 
 	private Player _player;
@@ -63,6 +66,8 @@ public class GameController : MonoBehaviour
 	{
 		_nameLabel.text = "Name: " + _player.GetName();
 	    OnMoneyChanged();
+
+	    UpdateBetText();
 	}
 
     private void OnMoneyChanged()
@@ -75,9 +80,13 @@ public class GameController : MonoBehaviour
 		UpdateGame(playerChoice);
 	}
 
+    private int GetBetAmount()
+    {
+        return currentBet;
+    }
 	private void UpdateGame(EUseableItem playerChoice)
 	{
-		UpdateGameLoader updateGameLoader = new UpdateGameLoader(_useableItemManager, playerChoice);
+		UpdateGameLoader updateGameLoader = new UpdateGameLoader(_useableItemManager, playerChoice, GetBetAmount());
 		updateGameLoader.OnLoaded += OnGameUpdated;
 		updateGameLoader.load();
 	}
@@ -118,5 +127,26 @@ public class GameController : MonoBehaviour
             _resultText.text = "Draw";
             _resultText.color = Color.yellow;
         }
+    }
+
+    public void LowerBet()
+    {
+        currentBet -= 10;
+        if (currentBet <= 0)
+        {
+            currentBet = 10;
+        }
+        UpdateBetText();
+    }
+
+    public void RaiseBet()
+    {
+        currentBet += 10;
+        UpdateBetText();
+    }
+
+    private void UpdateBetText()
+    {
+        betText.text = "Current bet:" + currentBet;
     }
 }
