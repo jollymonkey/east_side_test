@@ -13,6 +13,11 @@ public class GameController : MonoBehaviour
 	[SerializeField] private Text _moneyLabel;
     [SerializeField] private Text _resultText;
 
+    [SerializeField] private GridLayoutGroup choiceButtonGrid;
+    [SerializeField] private ChoiceButton _choiceButtonPrefab;
+
+    private List<ChoiceButton> choiceButons;
+
 	private Player _player;
 
     private UseableItemManager _useableItemManager;
@@ -32,6 +37,17 @@ public class GameController : MonoBehaviour
         _useableItemManager = new UseableItemManager();
         _useableItemManager.Initialize(possibleItem);
 
+        choiceButons = new List<ChoiceButton>();
+        for (int i = 0; i < possibleItem.Length; i++)
+        {
+            ChoiceButton c = Instantiate(_choiceButtonPrefab);
+            c.Initialize(_useableItemManager.GetUseableItemByEnum(possibleItem[i].value));
+            choiceButons.Add(c);
+            c.OnClicked += HandlePlayerInput;
+            c.transform.parent = choiceButtonGrid.transform;
+            c.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+
+        }
         _playerInfoLoader = new PlayerInfoLoader();
         _playerInfoLoader.OnLoaded += OnPlayerInfoLoaded;
         _playerInfoLoader.load("testuser"); // todo change to take in name, or pull last user
@@ -54,23 +70,8 @@ public class GameController : MonoBehaviour
         _moneyLabel.text = "Money: $" + _player.GetCoins().ToString();
     }
 
-	public void HandlePlayerInput(int item)
+	public void HandlePlayerInput(EUseableItem playerChoice)
 	{
-		EUseableItem playerChoice = EUseableItem.None;
-
-		switch (item)
-		{
-			case 1:
-				playerChoice = EUseableItem.Rock;
-				break;
-			case 2:
-				playerChoice = EUseableItem.Paper;
-				break;
-			case 3:
-				playerChoice = EUseableItem.Scissors;
-				break;
-		}
-
 		UpdateGame(playerChoice);
 	}
 

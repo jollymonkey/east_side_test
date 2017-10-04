@@ -7,5 +7,7 @@ public enum EUseableItem
 	Rock,
 	Paper,
 	Scissors,
+    Lizard,
+    Spock,
     MAX
 }
