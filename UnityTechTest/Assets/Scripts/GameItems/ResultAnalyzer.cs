@@ -12,11 +12,17 @@ public class ResultAnalyzer
 {
 	public static Result GetResultState(UseableItemManager useableItemManager, EUseableItem playerHand, EUseableItem enemyHand)
 	{
-	    if (playerHand == enemyHand)
+	    bool isPlayerStronger = isStronger(useableItemManager, playerHand, enemyHand);
+	    bool isEneemyStronger = isStronger(useableItemManager, enemyHand, playerHand);
+
+	    if (isPlayerStronger == isEneemyStronger)
 	    {
 	        return Result.Draw;
-	    }
-	    return isStronger(useableItemManager, playerHand, enemyHand) ? Result.Won : Result.Lost;
+	    }else if (isEneemyStronger)
+	    {
+	        return Result.Lost;
+        }
+        return Result.Won;
 	}
 
 	private static bool isStronger (UseableItemManager useableItemManager, EUseableItem firstHand, EUseableItem secondHand)

@@ -11,6 +11,7 @@ public class GameController : MonoBehaviour
 
 	[SerializeField] private Text _nameLabel;
 	[SerializeField] private Text _moneyLabel;
+    [SerializeField] private Text _resultText;
 
 	private Player _player;
 
@@ -82,17 +83,39 @@ public class GameController : MonoBehaviour
 
 	public void OnGameUpdated(Hashtable gameUpdateData)
 	{
-		playerHand.text = DisplayResultAsText((EUseableItem)gameUpdateData["resultPlayer"]);
-		enemyHand.text = DisplayResultAsText((EUseableItem)gameUpdateData["resultOpponent"]);
+		playerHand.text = DisplaySelectionAsText((EUseableItem)gameUpdateData["resultPlayer"]);
+		enemyHand.text = DisplaySelectionAsText((EUseableItem)gameUpdateData["resultOpponent"]);
 
-		_player.ChangeCoinAmount((int)gameUpdateData["coinsAmountChange"]);
+	    Result result = (Result)gameUpdateData["result"];
+	    DisplayResultAsText(result);
+
+        _player.ChangeCoinAmount((int)gameUpdateData["coinsAmountChange"]);
 	    OnMoneyChanged();
 
         _playerInfoLoader.Save();
 	}
 
-	private string DisplayResultAsText (EUseableItem result)
+	private string DisplaySelectionAsText (EUseableItem result)
 	{
 	    return _useableItemManager.GetUsableItemNameByEnum(result);
 	}
+
+    private void DisplayResultAsText(Result result)
+    {
+        if (result == Result.Won)
+        {
+            _resultText.text = "You Won";
+            _resultText.color = Color.green;
+        }
+        else if (result == Result.Lost)
+        {
+            _resultText.text = "You Lost";
+            _resultText.color = Color.green;
+        }
+        else
+        {
+            _resultText.text = "Draw";
+            _resultText.color = Color.yellow;
+        }
+    }
 }

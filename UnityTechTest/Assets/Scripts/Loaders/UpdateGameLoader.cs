@@ -23,15 +23,16 @@ public class UpdateGameLoader
 		Hashtable mockGameUpdate = new Hashtable();
 		mockGameUpdate["resultPlayer"] = _choice;
 		mockGameUpdate["resultOpponent"] = opponentHand;
-		mockGameUpdate["coinsAmountChange"] = GetCoinsAmount(_choice, opponentHand);
-		
-		OnLoaded(mockGameUpdate);
+
+        Result result = ResultAnalyzer.GetResultState(_itemManager, _choice, opponentHand);
+	    mockGameUpdate["result"] = result;
+        mockGameUpdate["coinsAmountChange"] = GetCoinsAmount(result);
+
+        OnLoaded(mockGameUpdate);
 	}
 
-	private int GetCoinsAmount (EUseableItem playerHand, EUseableItem opponentHand)
+	private int GetCoinsAmount (Result drawResult)
 	{
-		Result drawResult = ResultAnalyzer.GetResultState(_itemManager, playerHand, opponentHand);
-
 		if (drawResult.Equals (Result.Won))
 		{
 			return 10;
